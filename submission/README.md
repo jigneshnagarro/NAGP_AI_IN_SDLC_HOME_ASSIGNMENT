@@ -1,6 +1,6 @@
 # AI in SDLC: Home Assignment 2
 
-Video: <link>
+Video: [<link>](https://nagarro-my.sharepoint.com/:f:/p/jignesh_mistry/IgAsLW7mmsYbSIsknpwnT8rnAS0P2AKknUihcwNauyilafA?e=VEAANi)
 
 | # | Deliverable | Where |
 |---|---|---|
