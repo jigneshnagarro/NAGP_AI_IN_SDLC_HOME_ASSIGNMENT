@@ -1,0 +1,12 @@
+2026-11-03T08:03:42Z
+ops/evals/cases/case-11.diff applies cleanly
+ops/evals/cases/case-12.diff applies cleanly
+0616158 Add Session 3 operations material: incident packs, CI pipeline and review evals
+3834913 Add Playwright e2e setup and coverage collector
+4421968 Add tests, CI, agent conventions and use-case briefs
+ M .mcp.json
+?? backend/tests/InvoiceApp.Tests/ArchitectureTests.cs
+?? ops/evals/cases/case-11.diff
+?? ops/evals/cases/case-12.diff
+?? ops/evals/results.csv
+?? submission/

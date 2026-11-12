@@ -1,0 +1,61 @@
+Review this diff for defects. For each finding give the file, the line, what
+goes wrong, and how confident you are. If you find nothing, say so
+explicitly rather than listing general observations.
+
+Before answering, check the diff specifically for: missing or wrong
+authorisation, unvalidated or null input, injection, data races on shared
+state, swallowed exceptions or wrong status codes, money/rounding changes,
+time-zone handling, and secrets or personal data written to logs.
+Only report a defect if you can quote the exact changed line that causes it.
+Style, naming and "could be improved" notes are not defects — leave them out.
+
+```diff
+diff --git a/backend/src/InvoiceApp.Domain/ApprovalService.cs b/backend/src/InvoiceApp.Domain/ApprovalService.cs
+--- a/backend/src/InvoiceApp.Domain/ApprovalService.cs
++++ b/backend/src/InvoiceApp.Domain/ApprovalService.cs
+@@ -11,9 +11,9 @@ public class ApprovalService
+ {
+-    private readonly IInvoiceRepository _repository;
++    private readonly IInvoiceRepository _invoices;
+
+-    public ApprovalService(IInvoiceRepository repository)
++    public ApprovalService(IInvoiceRepository invoices)
+     {
+-        _repository = repository;
++        _invoices = invoices;
+     }
+
+@@ -24,7 +24,7 @@ public class ApprovalService
+         }
+
+         invoice.Status = InvoiceStatus.PendingApproval;
+-        _repository.Update(invoice);
++        _invoices.Update(invoice);
+         return invoice;
+     }
+
+@@ -36,7 +36,7 @@ public class ApprovalService
+         invoice.Status = InvoiceStatus.Approved;
+         invoice.DecidedBy = approver;
+         invoice.DecidedAt = DateTime.UtcNow;
+-        _repository.Update(invoice);
++        _invoices.Update(invoice);
+         return invoice;
+     }
+
+@@ -52,12 +52,12 @@ public class ApprovalService
+         invoice.Status = InvoiceStatus.Rejected;
+         invoice.DecidedBy = approver;
+         invoice.DecidedAt = DateTime.UtcNow;
+         invoice.DecisionNote = reason;
+-        _repository.Update(invoice);
++        _invoices.Update(invoice);
+         return invoice;
+     }
+
+     private Invoice Find(string invoiceId) =>
+-        _repository.GetById(invoiceId)
++        _invoices.GetById(invoiceId)
+         ?? throw new KeyNotFoundException($"Invoice {invoiceId} was not found.");
+
+```

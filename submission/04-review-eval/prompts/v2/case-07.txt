@@ -1,0 +1,30 @@
+Review this diff for defects. For each finding give the file, the line, what
+goes wrong, and how confident you are. If you find nothing, say so
+explicitly rather than listing general observations.
+
+Before answering, check the diff specifically for: missing or wrong
+authorisation, unvalidated or null input, injection, data races on shared
+state, swallowed exceptions or wrong status codes, money/rounding changes,
+time-zone handling, and secrets or personal data written to logs.
+Only report a defect if you can quote the exact changed line that causes it.
+Style, naming and "could be improved" notes are not defects — leave them out.
+
+```diff
+diff --git a/backend/src/InvoiceApp.Api/Controllers/ApprovalsController.cs b/backend/src/InvoiceApp.Api/Controllers/ApprovalsController.cs
+--- a/backend/src/InvoiceApp.Api/Controllers/ApprovalsController.cs
++++ b/backend/src/InvoiceApp.Api/Controllers/ApprovalsController.cs
+@@ -28,9 +28,15 @@ public class ApprovalsController : ApiControllerBase
+     [HttpPost("{id}/approve")]
+     [RequireRole("Approver")]
+     public IActionResult Approve(string id)
+     {
+         var invoice = _approvals.Approve(id, CurrentUser.Name);
+
++        _logger.LogInformation(
++            "Approval completed. Invoice payload: {@Invoice}. Session: {@Session}",
++            invoice, CurrentUser);
++
+         return Ok(DecisionResponse.From(invoice));
+     }
+
+```

@@ -1,0 +1,35 @@
+sequenceDiagram
+    autonumber
+    actor A as Approver (browser) [C1]
+    participant UI as app.js [C3]
+    participant MW as SessionAuthMiddleware [C4]
+    participant SS as SessionStore [C5]
+    participant RR as RequireRoleAttribute [C15]
+    participant AC as ApprovalsController.Approve [C8]
+    participant H as ApiControllerBase.Handle [C16]
+    participant S as ApprovalService.Approve [C12]
+    participant R as InMemoryInvoiceRepository [C10]
+
+    A->>UI: click Approve
+    UI->>MW: POST /api/approvals/{invoiceId}/approve<br/>Authorization: Bearer token
+    MW->>SS: Get(token)
+    alt no session
+        MW-->>UI: 401
+    end
+    MW->>RR: session in HttpContext.Items["session"]
+    alt role not Approver/Admin
+        RR-->>UI: 403
+    end
+    RR->>AC: invoke
+    AC->>H: Handle(() => Approve(id, username))
+    H->>S: Approve(invoiceId, approver)
+    S->>R: GetById(invoiceId)
+    alt not found
+        S-->>H: KeyNotFoundException → 404
+    else status != PendingApproval
+        S-->>H: InvalidOperationException → 409
+    end
+    S->>S: Status=Approved, DecidedBy, DecidedAt=UtcNow
+    S->>R: Update(invoice) — lock, replace in list
+    H-->>UI: 200 + invoice JSON
+    Note over R: Nothing is persisted, published or sent to PayEx.<br/>Restarting the process loses every approval.

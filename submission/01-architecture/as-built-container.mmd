@@ -1,0 +1,31 @@
+flowchart LR
+    user["Browser user<br/>Approver or Admin [C1]"]
+
+    subgraph appservice["InvoiceApp.Api process — one ASP.NET Core 8 app [C2]"]
+        ui["Static web UI<br/>wwwroot/index.html, app.js [C3]"]
+        mw["SessionAuthMiddleware<br/>bearer token check on /api [C4]"]
+        sessions[("SessionStore<br/>in-memory ConcurrentDictionary [C5]")]
+        authc["AuthController<br/>POST /api/auth/login, logout [C6]"]
+        invc["InvoicesController<br/>/api/invoices [C7]"]
+        apprc["ApprovalsController<br/>/api/approvals/{id}/approve|reject<br/>RequireRole Approver, Admin [C8]"]
+        users["Demo users<br/>appsettings.json Users [C9]"]
+        repo[("InMemoryInvoiceRepository<br/>List + lock, seeded INV-1001..1005 [C10]")]
+    end
+
+    subgraph domain["InvoiceApp.Domain library [C11]"]
+        svc["ApprovalService<br/>Draft → Pending → Approved/Rejected [C12]"]
+        irepo["IInvoiceRepository interface [C13]"]
+        disc["DiscountCalculator<br/>not called by any endpoint [C14]"]
+    end
+
+    user -->|HTTP| ui
+    ui -->|"fetch /api/... + Bearer token [C3]"| mw
+    mw --> sessions
+    mw --> authc & invc & apprc
+    authc --> users
+    authc --> sessions
+    invc --> svc
+    invc --> irepo
+    apprc --> svc
+    svc --> irepo
+    irepo -. implemented by .-> repo

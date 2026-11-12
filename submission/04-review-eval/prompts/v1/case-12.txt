@@ -1,0 +1,30 @@
+Review this diff for defects. For each finding give the file, the line, what
+goes wrong, and how confident you are. If you find nothing, say so
+explicitly rather than listing general observations.
+
+```diff
+diff --git a/backend/src/InvoiceApp.Api/Controllers/AuthController.cs b/backend/src/InvoiceApp.Api/Controllers/AuthController.cs
+--- a/backend/src/InvoiceApp.Api/Controllers/AuthController.cs
++++ b/backend/src/InvoiceApp.Api/Controllers/AuthController.cs
+@@ -9,6 +9,7 @@ namespace InvoiceApp.Api.Controllers;
+ [Route("api/auth")]
+ public class AuthController : ControllerBase
+ {
++    private const string BearerPrefix = "Bearer ";
+     private readonly DemoUsersOptions _options;
+     private readonly SessionStore _sessions;
+ 
+@@ -38,9 +39,9 @@ public class AuthController : ControllerBase
+     public IActionResult Logout()
+     {
+         var header = Request.Headers.Authorization.ToString();
+-        if (header.StartsWith("Bearer "))
++        if (header.StartsWith(BearerPrefix))
+         {
+-            _sessions.Remove(header["Bearer ".Length..]);
++            _sessions.Remove(header[BearerPrefix.Length..]);
+         }
+ 
+         return NoContent();
+
+```

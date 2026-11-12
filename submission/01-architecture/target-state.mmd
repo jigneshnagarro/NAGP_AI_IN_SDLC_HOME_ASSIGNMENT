@@ -1,0 +1,33 @@
+flowchart LR
+    user["Browser user"]
+
+    subgraph azure["Azure App Service — 3 instances (planned) [N]"]
+        api["InvoiceApp.Api<br/>controllers + auth (exists)"]
+        svc["ApprovalService (exists)"]
+        sqlrepo["SqlInvoiceRepository<br/>implements IInvoiceRepository [N]"]
+        relay["Outbox relay / PayEx submission worker<br/>BackgroundService [N]"]
+        recon["Nightly reconciliation job [N]"]
+    end
+
+    subgraph sql["Azure SQL [N]"]
+        inv[("Invoices [N]")]
+        outbox[("PaymentOutbox<br/>InvoiceId UNIQUE, Status, Attempts [N]")]
+        audit[("ApprovalAudit — 7-year retention [N]")]
+    end
+
+    sb[["Azure Service Bus topic<br/>invoice.approved — provisioned, unused [N]"]]
+    notif["Notification worker [N]"]
+    payex(["PayEx external API<br/>30 s timeout, returns reference [N]"])
+
+    user --> api --> svc --> sqlrepo
+    sqlrepo -->|"one transaction:<br/>invoice + outbox + audit"| inv & outbox & audit
+    relay -->|poll pending| outbox
+    relay -->|"submit, Idempotency-Key = InvoiceId"| payex
+    relay -->|publish after success| sb --> notif
+    recon -->|compare references| payex
+    recon --> outbox
+
+    classDef exists fill:#d9f2d9,stroke:#2e7d32,color:#000;
+    classDef planned fill:#fff3e0,stroke:#ef6c00,stroke-dasharray:5 5,color:#000;
+    class api,svc,user exists;
+    class sqlrepo,relay,recon,inv,outbox,audit,sb,notif,payex planned;

@@ -1,0 +1,26 @@
+2026-11-03T08:03:41Z
+== Number 1: CI pipeline duration (the build/test part of lead time for changes)
+runs: 20  window: 2026-01-19 to 2026-02-02
+median: 31.3 min   p90: 34.5 min   min: 28.4   max: 35.1
+
+== Number 2: CI run failure rate
+all runs: 2/20 = 10%
+pull_request: 2/12   main push: 0/8
+  failed: 2026-01-23 19:50 fix/notification-filter (17 of 19 steps recorded)
+  failed: 2026-01-29 23:20 fix/approval-audit (19 of 19 steps recorded)
+
+== Proxy: branch first-PR-run -> next main push (lead time, rough)
+  feature/supplier-contacts: 70.4 h  (1 PR runs)
+  fix/notification-filter: 291.3 h  (6 PR runs)
+  chore/dependency-bumps: 47.8 h  (2 PR runs)
+  fix/approval-audit: 66.9 h  (2 PR runs)
+  feature/payex-retry: 26.4 h  (1 PR runs)
+
+== Git history of this repository
+commits on main: 6   merge commits (PRs): 0
+  2026-10-12T10:20:35Z|Nitin|Add Session 3 operations material: incident packs, CI pipeline and review evals
+  2026-10-05T10:20:47Z|Workshop Presenter|Add Playwright e2e setup and coverage collector
+  2026-10-05T10:19:03Z|Workshop Presenter|Add tests, CI, agent conventions and use-case briefs
+  2026-10-05T10:19:03Z|Workshop Presenter|Add web UI for invoices and approvals
+  2026-10-05T10:19:03Z|Workshop Presenter|Add API: sign-in, invoices and approvals endpoints
+  2026-10-05T10:19:03Z|Workshop Presenter|Add domain: invoice lifecycle and discount rules

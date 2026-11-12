@@ -1,0 +1,30 @@
+Review this diff for defects. For each finding give the file, the line, what
+goes wrong, and how confident you are. If you find nothing, say so
+explicitly rather than listing general observations.
+
+```diff
+diff --git a/backend/src/InvoiceApp.Domain/ApprovalService.cs b/backend/src/InvoiceApp.Domain/ApprovalService.cs
+--- a/backend/src/InvoiceApp.Domain/ApprovalService.cs
++++ b/backend/src/InvoiceApp.Domain/ApprovalService.cs
+@@ -31,11 +31,18 @@ public class ApprovalService
+     public Invoice Approve(string invoiceId, string approver)
+     {
+         var invoice = Find(invoiceId);
+         EnsurePending(invoice);
+ 
++        // Month-end cut-off: approvals after 18:00 on the last day roll into next period.
++        var now = DateTime.Now;
++        if (now.Hour >= 18 && now.AddDays(1).Month != now.Month)
++        {
++            invoice.DecisionNote = "Rolled to next period";
++        }
++
+         invoice.Status = InvoiceStatus.Approved;
+         invoice.DecidedBy = approver;
+-        invoice.DecidedAt = DateTime.UtcNow;
++        invoice.DecidedAt = now;
+         _repository.Update(invoice);
+         return invoice;
+     }
+
+```

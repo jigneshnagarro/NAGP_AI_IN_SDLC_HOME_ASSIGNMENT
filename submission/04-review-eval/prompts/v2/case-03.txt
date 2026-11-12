@@ -1,0 +1,28 @@
+Review this diff for defects. For each finding give the file, the line, what
+goes wrong, and how confident you are. If you find nothing, say so
+explicitly rather than listing general observations.
+
+Before answering, check the diff specifically for: missing or wrong
+authorisation, unvalidated or null input, injection, data races on shared
+state, swallowed exceptions or wrong status codes, money/rounding changes,
+time-zone handling, and secrets or personal data written to logs.
+Only report a defect if you can quote the exact changed line that causes it.
+Style, naming and "could be improved" notes are not defects — leave them out.
+
+```diff
+diff --git a/backend/src/InvoiceApp.Domain/DiscountCalculator.cs b/backend/src/InvoiceApp.Domain/DiscountCalculator.cs
+--- a/backend/src/InvoiceApp.Domain/DiscountCalculator.cs
++++ b/backend/src/InvoiceApp.Domain/DiscountCalculator.cs
+@@ -12,9 +12,9 @@ public static class DiscountCalculator
+     public static decimal Apply(decimal amount, decimal discountPercent)
+     {
+         var discount = amount * (discountPercent / 100m);
+-        var discounted = amount - discount;
+
+-        return Math.Round(discounted, 2, MidpointRounding.AwayFromZero);
++        return Math.Round(amount - Math.Round(discount, 2, MidpointRounding.ToZero),
++            2, MidpointRounding.ToZero);
+     }
+ }
+
+```
